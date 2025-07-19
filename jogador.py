@@ -34,25 +34,36 @@ def mostrarMao(mao):
   
   print()
 
-def jogador1():
-    # Criação do baralho com 52 cartas
-    baralho = []
+def jogador():
+    # Configuração do socket do jogador
+    hostDestino = "localhost"
+    porta = 8082
+    cargaDados = 2048
 
-    for naipe in range(1, 5):
-        for numero in range(1, 14):
-            baralho.append([naipe, numero])
+    jogador = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    enderecoServidor = (hostDestino, porta)
+
+    jogador.connect(enderecoServidor)
+
+    mao_codificada = jogador.recv(cargaDados)
+    mao = eval(mao_codificada.decode("utf-8"))
 
     # Início do jogo
     jogoEmAndamento = True
 
-    mao = [baralho.pop(random.randint(0, len(baralho) - 1)) for _ in range(9)]
-    monte = []
     rodadas = 0
 
     print("\n----- Cacheta -----")
     print("Início do jogo!")
 
     while jogoEmAndamento:
+        # Recebimento do baralho e do monte atual
+        dados_codificados = jogador.recv(cargaDados)
+        dadosRecebidos = eval(dados_codificados.decode("utf-8"))
+
+        baralho = dadosRecebidos[0]
+        monte = dadosRecebidos[1]
+
         rodadas += 1
 
         print("------------------------------")
@@ -101,4 +112,10 @@ def jogador1():
         carta = formatacaoCarta(cartaJogada)
         print(f"\nCarta jogada: [{carta[0]}, {carta[1]}]")
 
-jogador1()
+        # Envio do baralho e do monte atual para o servidor
+        dadosParaEnviar = [baralho, monte]
+        dados_codificados = str(dadosParaEnviar).encode("utf-8")
+
+        jogador.send(dados_codificados)
+
+jogador()
