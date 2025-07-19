@@ -72,26 +72,26 @@ def servidor():
     while jogoEmAndamento:
         rodadas += 1
 
-        print("------------------------------")
+        print("\n------------------------------")
 
         print(f"\n{rodadas}ª Rodada")
-
-        if(monte):
-            carta = formatacaoCarta(monte[-1])
-            print(f"\nTopo do monte: [{carta[0]}, {carta[1]}]")
 
         for i in range(1, 3):
             dadosParaEnviar = [baralho, monte]
             dados_codificados = str(dadosParaEnviar).encode("utf-8")
 
             if(i == 1): # Vez do Jogador Nº 1
+                print("\nVez do Jogador 1...")
                 j1.send(dados_codificados)
 
                 dados_codificados = j1.recv(cargaDados)
             else: # Vez do Jogador Nº 2
+                print("\nVez do Jogador 2...")
                 j2.send(dados_codificados)
 
                 dados_codificados = j2.recv(cargaDados)
+            
+            print("Jogada feita!")
 
             dadosRecebidos = eval(dados_codificados.decode("utf-8"))
             baralho = dadosRecebidos[0]
